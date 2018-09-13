@@ -1,0 +1,324 @@
+<form [formGroup]="amountRefundGroup" appIdentifier [base]="'REFUND.RA.amount'">
+
+  <!-- CHECK BOXES -->
+  <div class="form-row">
+
+    <!-- PARTIAL REFUND -->
+    <div class="form-group col-2">
+      <bspl-input-check-switch l10nTranslate
+        [groupForm]="amountRefundGroup"
+        [controlName]="'partialRefund'"
+        [isCheckBox]="true"
+        [labelCheck]="'REFUNDS.AMOUNT.partial_refund'">
+      </bspl-input-check-switch>
+      <div *ngIf="errorPartialRefund">
+        <bspl-field-error [errors]="amountRefundGroup.get('partialRefund').errors"></bspl-field-error>
+      </div>
+    </div>
+
+    <!-- NET REMIT -->
+    <div class="form-group col-3" *ngIf="refundConfiguration.nrRefundsAllowed">
+      <bspl-input-check-switch l10nTranslate
+        [groupForm]="amountRefundGroup"
+        [controlName]="'netRemit'"
+        [isCheckBox]="true"
+        [labelCheck]="'REFUNDS.AMOUNT.net_remit'">
+      </bspl-input-check-switch>
+    </div>
+  </div>
+
+  <div class="row" formGroupName="amounts">
+    <div class="col-6">
+
+      <!-- GROSS FARE -->
+      <div class="form-row">
+        <div class="form-group col-5">
+          <bspl-input-form-control l10nTranslate
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'grossFare'"
+            [wrapText]="true"
+            [type]="'decimal'"
+            [decimalsNumber]="getNumDecimals()"
+            [label]="'REFUNDS.AMOUNT.gross_fare'">
+          </bspl-input-form-control>
+        </div>
+      </div>
+
+      <!-- LESS GROSS FARE USED -->
+      <div class="form-row">
+        <div class="form-group col-5">
+          <bspl-input-form-control l10nTranslate
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'lessGrossFareUsed'"
+            [wrapText]="true" [type]="'decimal'"
+            [decimalsNumber]="getNumDecimals()"
+            [label]="'REFUNDS.AMOUNT.less_gross_fare_used'">
+          </bspl-input-form-control>
+        </div>
+      </div>
+
+      <!-- TOTAL GROSS FARE REFUNDED -->
+      <div class="form-row">
+        <div class="form-group col-5">
+          <bspl-input-form-control l10nTranslate
+            [type]="'decimal'"
+            [decimalsNumber]="getNumDecimals()"
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'totalGrossFareRefunded'"
+            [wrapText]="true" [label]="'REFUNDS.AMOUNT.total_gross_fare_refunded'">
+          </bspl-input-form-control>
+        </div>
+      </div>
+
+      <!-- SECTION COMMISSION -->
+      <div class="form-row">
+
+        <div class="form-group col-2">
+          <label class="text-nowrap" l10nTranslate>REFUNDS.AMOUNT.commission</label>
+          <div class="input-group pt-1">
+            <div class="custom-radio">
+              <input id="radio_percent" type="radio" value="false" [checked]="false" formControlName="radioCommission">
+              <label for="radio_percent" class="text-nowrap" l10nTranslate>
+                <span></span>REFUNDS.AMOUNT.percent</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-3">
+          <bspl-input-form-control l10nTranslate
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'commissionRate'"
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_INPUT_PERCENT"
+            [inputMaxTextLength]="5"
+            [label]="'&nbsp;'">
+          </bspl-input-form-control>
+        </div>
+
+        <div class="form-group col-3">
+          <label>&nbsp;</label>
+          <div class="input-group pt-1">
+            <div class="custom-radio">
+              <input id="radio_amount" type="radio" value="true" formControlName="radioCommission" [checked]="true">
+              <label for="radio_amount" class="text-nowrap" l10nTranslate>
+                <span></span>REFUNDS.AMOUNT.title</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-4">
+          <bspl-input-form-control l10nTranslate
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'commissionAmount'"
+            [wrapText]="true"
+            [type]="'decimal'"
+            [decimalsNumber]="getNumDecimals()"
+            [label]="'&nbsp;'">
+          </bspl-input-form-control>
+        </div>
+
+      </div>
+
+      <!-- SECTION DISCOUNT AMOUNT -->
+      <div class="form-row">
+        <div class="form-group col-5">
+          <bspl-input-form-control l10nTranslate
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'spam'"
+            [wrapText]="true"
+            [type]="'decimal'"
+            [decimalsNumber]="getNumDecimals()"
+            [label]="'REFUNDS.AMOUNT.discountAmount'">
+          </bspl-input-form-control>
+        </div>
+      </div>
+
+      <!-- SECTION TAXES -->
+      <div class="form-row">
+        <div class="form-group col-5">
+          <label class="text-nowrap" l10nTranslate>REFUNDS.AMOUNT.total_taxes</label>
+          <input class="form-control" disabled="true" [value]="amountRefundGroup.get('amounts').get('tax').value | decimalsFormatter:getNumDecimals()">
+        </div>
+      </div>
+
+      <!-- Array TAXES -->
+      <div formArrayName="taxMiscellaneousFees">
+        <div class="form-row" *ngFor="let tax of getTaxMiscellaneousFees().controls; let i = index;" [formGroupName]="i">
+
+          <div class="form-group col-4">
+            <bspl-input-form-control l10nTranslate
+              [groupForm]="tax"
+              [controlName]="'type'"
+              [wrapText]="true"
+              [type]="'regex'"
+              [typingPattern]="PT_ALPHANUMERIC_UPPERCASE"
+              [label]="'REFUNDS.AMOUNT.taxes'">
+            </bspl-input-form-control>
+          </div>
+
+          <div class="form-group col-5">
+            <bspl-input-form-control l10nTranslate
+              [groupForm]="tax"
+              [controlName]="'amount'"
+              [wrapText]="true"
+              [type]="'decimal'"
+              [decimalsNumber]="getNumDecimals()"
+              [label]="'&nbsp;'">
+            </bspl-input-form-control>
+          </div>
+
+          <!-- BUTTON ADD/REMOVE -->
+          <div class="form-group col-3">
+            <label>&nbsp;</label>
+            <input
+              *ngIf="showTrash(i)"
+              readonly
+              class="form-group form-control-plaintext ico-trash-container"
+              (click)="removeTax(i)">
+
+            <button *ngIf="!showTrash(i)" class="form-control btn btn-primary btn-blue" [disabled]="disableAddTax()" l10nTranslate (click)="addTax()">
+              <i class="fa fa-plus-circle"></i> REFUNDS.AMOUNT.tax
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-6">
+
+      <!-- SECTION CANCELATION PENALTY-->
+      <div class="form-row">
+        <div class="form-group col-5" *ngIf="refundConfiguration.penaltyChargeEnabled">
+          <bspl-input-form-control l10nTranslate
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'cancellationPenalty'"
+            [wrapText]="true"
+            [type]="'decimal'"
+            [decimalsNumber]="getNumDecimals()"
+            [inputMaxTextLength]="11"
+            [label]="'REFUNDS.AMOUNT.cancellationPenalty'">
+          </bspl-input-form-control>
+        </div>
+      </div>
+
+      <!-- TAX ON CANCELATION PENALTY-->
+      <div class="form-row">
+        <div class="form-group col-5" *ngIf="refundConfiguration.vatOnMfAndVatOnCpEnabled">
+          <bspl-input-form-control l10nTranslate
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'taxOnCancellationPenalty'"
+            [wrapText]="true"
+            [type]="'decimal'"
+            [decimalsNumber]="getNumDecimals()"
+            [inputMaxTextLength]="11"
+            [label]="'REFUNDS.AMOUNT.taxCP'">
+          </bspl-input-form-control>
+        </div>
+      </div>
+
+      <!-- SECTION MISCELLANEOUS FEE -->
+      <div class="form-row">
+        <div class="form-group col-5" *ngIf="refundConfiguration.handlingFeeEnabled">
+          <bspl-input-form-control l10nTranslate
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'miscellaneousFee'"
+            [wrapText]="true"
+            [type]="'decimal'"
+            [decimalsNumber]="getNumDecimals()"
+            [inputMaxTextLength]="11"
+            [label]="'REFUNDS.AMOUNT.miscFee'">
+          </bspl-input-form-control>
+        </div>
+      </div>
+
+      <!-- TAX ON MISCELLANEOUS FEE -->
+      <div class="form-row">
+        <div class="form-group col-5" *ngIf="refundConfiguration.vatOnMfAndVatOnCpEnabled">
+          <bspl-input-form-control l10nTranslate
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'taxOnMiscellaneousFee'"
+            [wrapText]="true"
+            [type]="'decimal'"
+            [decimalsNumber]="getNumDecimals()"
+            [inputMaxTextLength]="11"
+            [label]="'REFUNDS.AMOUNT.taxMF'">
+          </bspl-input-form-control>
+        </div>
+      </div>
+
+      <!-- SECTION TOTAL COMMISSION ON CP AND MF-->
+      <div class="form-row" *ngIf="refundConfiguration.commissionOnCpAndMfEnabled">
+
+        <div class="form-group col-2">
+          <label class="text-nowrap" l10nTranslate>REFUNDS.AMOUNT.totalCommissionCPMF</label>
+          <div class="input-group pt-1">
+            <div class="custom-radio">
+              <input id="radio_percent_CPMF"
+                type="radio"
+                value="false"
+                [checked]="false"
+                formControlName="radioCpAndMfCommission">
+              <label for="radio_percent_CPMF" class="text-nowrap" l10nTranslate>
+                <span></span>REFUNDS.AMOUNT.percent</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-3">
+          <bspl-input-form-control l10nTranslate
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'commissionOnCpAndMfRate'"
+            [wrapText]="true"
+            [label]="'&nbsp;'"
+            [type]="'regex'"
+            [typingPattern]="PT_INPUT_PERCENT"
+            [inputMaxTextLength]="5">
+          </bspl-input-form-control>
+        </div>
+
+        <div class="form-group col-3">
+          <label>&nbsp;</label>
+          <div class="input-group pt-1">
+            <div class="custom-radio">
+              <input id="radio_amount_CPMF"
+                name=""
+                type="radio"
+                value="true"
+                [checked]="true"
+                formControlName="radioCpAndMfCommission">
+              <label for="radio_amount_CPMF" class="text-nowrap" l10nTranslate>
+                <span></span>REFUNDS.AMOUNT.title</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group col-4">
+          <bspl-input-form-control l10nTranslate
+            [groupForm]="amountRefundGroup.get('amounts')"
+            [controlName]="'commissionOnCpAndMfAmount'"
+            [wrapText]="true"
+            [type]="'decimal'"
+            [decimalsNumber]="getNumDecimals()"
+            [label]="'&nbsp;'">
+          </bspl-input-form-control>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="form-row">
+        <!-- REFUND TO PASSENGER -->
+        <div class="form-group col-2">
+          <label class="text-nowrap" l10nTranslate>REFUNDS.AMOUNT.refund_to_passenger</label>
+          <input class="form-control"
+            disabled="true"
+            [value]="model.refundToPassenger.value | decimalsFormatter:getNumDecimals()">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</form>

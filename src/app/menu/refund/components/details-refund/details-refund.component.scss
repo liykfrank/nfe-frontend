@@ -1,0 +1,51 @@
+@import '/../../../../../theme/general.scss';
+
+.border-red {
+    border-color: red !important;
+  }
+#details-refund{
+
+    label{
+        color:	#152C5A;
+    }
+
+    textarea{
+        resize: none;
+    }
+
+    .title-refund{
+        font-size: 16px;
+        font-weight: bold;
+        color: #152C5A;
+    }
+
+    textarea {
+        resize: none;
+
+        &.error {
+          border-color: red !important;
+        }
+      }
+
+      .btn-blue{
+        background-color: #1989CF !important;
+
+        i{
+            font-size:14px;
+        }
+    }
+
+
+}
+
+textarea {
+  resize: none;
+
+  &.error {
+    border-color: red !important;
+  }
+}
+
+
+
+

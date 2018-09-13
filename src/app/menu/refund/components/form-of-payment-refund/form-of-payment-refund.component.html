@@ -1,0 +1,196 @@
+<form [formGroup]="formOfPaymentRefundGroup" appIdentifier [base]="'REFUND.RA.form_of_payment'">
+
+  <div class="row">
+    <div class="col">
+      <div formArrayName="formOfPaymentAmounts">
+
+        <!-- FOP Amounts -->
+        <div class="form-row" *ngFor="let amountElems of getFormOfPaymentAmounts().controls; let i=index" [formGroupName]="i">
+
+          <div class="form-group align-bottom col-2">
+            <label>&nbsp;</label>
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              [value]="getLabelType(i) | translate">
+          </div>
+
+          <!-- AMOUNT SELECT -->
+          <div class="form-group col-2">
+            <bspl-input-form-control l10nTranslate
+              [wrapText]="true"
+              [type]="'decimal'"
+              [decimalsNumber]="getNumDecimals()"
+              [label]="'REFUNDS.FORM_OF_PAYMENT.amount'"
+              [groupForm]="model.formOfPaymentAmounts.get(i.toString())"
+              [controlName]="'amount'">
+            </bspl-input-form-control>
+          </div>
+
+          <!-- VENDOR CODE (TYPE) SELECT-->
+          <div *ngIf="model.formOfPaymentAmounts.get(i.toString()).get('vendorCode').enabled" class="form-group col-1">
+            <bspl-input-form-control l10nTranslate
+              [wrapText]="true"
+              [type]="'regex'"
+              [typingPattern]="PT_CAPITALTEXT"
+              [inputMaxTextLength]="'2'"
+              [label]="'REFUNDS.FORM_OF_PAYMENT.type'"
+              [groupForm]="model.formOfPaymentAmounts.get(i.toString())"
+              [controlName]="'vendorCode'">
+            </bspl-input-form-control>
+          </div>
+
+          <!-- CARD NUMBER SELECT-->
+          <div *ngIf="model.formOfPaymentAmounts.get(i.toString()).get('number').enabled" class="form-group col-3">
+            <bspl-input-form-control l10nTranslate
+              [wrapText]="true"
+              [type]="'regex'"
+              [typingPattern]="PT_NUMBER"
+              [inputMaxTextLength]="'19'"
+              [label]="'REFUNDS.FORM_OF_PAYMENT.creditCardNumber'"
+              [groupForm]="model.formOfPaymentAmounts.get(i.toString())"
+              [controlName]="'number'">
+            </bspl-input-form-control>
+          </div>
+
+          <div class="form-group col-2">
+            <label>&nbsp;</label>
+            <input
+              readonly
+              class="form-control-plaintext ico-trash-container"
+              (click)="onCkickTrashIcon(i)">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-2">
+          <label class="text-nowrap" l10nTranslate>REFUNDS.FORM_OF_PAYMENT.formOfPayment</label>
+          <select class="form-control dropdown-custom" formControlName="type">
+            <option disabled selected value=''>Choose</option>
+            <option *ngFor="let aux of fopList" [value]="aux" l10nTranslate>REFUNDS.FORM_OF_PAYMENT.{{aux}}</option>
+          </select>
+        </div>
+
+        <!-- AMOUNT SELECT -->
+        <div class="form-group col-2">
+          <bspl-input-form-control l10nTranslate
+            [wrapText]="true"
+            [type]="'decimal'"
+            [decimalsNumber]="getNumDecimals()"
+            [label]="'REFUNDS.FORM_OF_PAYMENT.amount'"
+            [groupForm]="selectAmount"
+            [controlName]="'amount'">
+          </bspl-input-form-control>
+        </div>
+
+        <!-- VENDOR CODE (TYPE) SELECT-->
+        <div *ngIf="selectAmount.get('vendorCode').enabled" class="form-group col-1">
+          <bspl-input-form-control l10nTranslate
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_ALPHANUMERIC"
+            [inputMaxTextLength]="'2'"
+            [label]="'REFUNDS.FORM_OF_PAYMENT.type'"
+            [groupForm]="selectAmount"
+            [controlName]="'vendorCode'">
+          </bspl-input-form-control>
+        </div>
+
+        <!-- CARD NUMBER SELECT-->
+        <div *ngIf="selectAmount.get('number').enabled" class="form-group col-3">
+          <bspl-input-form-control l10nTranslate
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_NUMBER"
+            [inputMaxTextLength]="'19'"
+            [label]="'REFUNDS.FORM_OF_PAYMENT.creditCardNumber'"
+            [groupForm]="selectAmount"
+            [controlName]="'number'">
+          </bspl-input-form-control>
+        </div>
+
+        <div class="form-group col-2">
+            <label>&nbsp;</label>
+
+            <div *ngIf="validFopSelected">
+              <button class="form-control btn btn-primary btn-blue" l10nTranslate [disabled]="disabledPlusIcon()" (click)="onClickPlusIcon()">
+                <i class="fa fa-plus-circle"></i> REFUNDS.FORM_OF_PAYMENT.buttonPlus
+              </button>
+            </div>
+
+            <div *ngIf="!validFopSelected" class="tooltip-container">
+              <bspl-field-error [errors]="{customError: {message : 'FORM_CONTROL_VALIDATORS.maxFop'}}"></bspl-field-error>
+            </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group offset-2 col-2">
+          <label class="text-nowrap" l10nTranslate>REFUNDS.FORM_OF_PAYMENT.subTotalCreditEp</label>
+          <input class="form-control"
+            disabled="true"
+            [value]="model.creditEPSubTotal.value | decimalsFormatter:getNumDecimals()">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group offset-2 col-2">
+          <label class="text-nowrap" l10nTranslate>REFUNDS.FORM_OF_PAYMENT.totalRefundAmount</label>
+          <input class="form-control"
+            disabled="true"
+            [value]="model.totalAmount.value | decimalsFormatter:getNumDecimals()">
+        </div>
+      </div>
+
+
+      <div class="form-row">
+        <div class="form-group col-2">
+          <bspl-currency
+            [iso]="refundConfiguration.isoCountryCode || null"
+            [type]="type"
+            [defaultCurrency]="refundConfiguration.defaultCurrency">
+          </bspl-currency>
+        </div>
+
+        <div class="form-group col-3">
+          <bspl-input-form-control l10nTranslate
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_TOUR_CODE"
+            [inputMaxTextLength]="15"
+            [label]="'REFUNDS.FORM_OF_PAYMENT.tourCode'"
+            [groupForm]="formOfPaymentRefundGroup"
+            [controlName]="'tourCode'">
+          </bspl-input-form-control>
+        </div>
+
+        <div class="form-group col-4" *ngIf="showCustomerRef()">
+          <bspl-input-form-control l10nTranslate
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_ALPHANUMERIC"
+            [inputMaxTextLength]="24"
+            [label]="'REFUNDS.FORM_OF_PAYMENT.customerRef'"
+            [groupForm]="formOfPaymentRefundGroup"
+            [controlName]="'customerFileReference'">
+          </bspl-input-form-control>
+        </div>
+
+        <div class="form-group col-3">
+          <bspl-input-form-control l10nTranslate
+            *ngIf="refundConfiguration.electronicTicketValidationsEnabled"
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_ALPHANUMERIC_LOWERCASE_WITH_SPACE"
+            [inputMaxTextLength]="14"
+            [label]="'REFUNDS.FORM_OF_PAYMENT.electronicTicketAuthCode'"
+            [groupForm]="formOfPaymentRefundGroup"
+            [controlName]="'settlementAuthorisationCode'">
+          </bspl-input-form-control>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

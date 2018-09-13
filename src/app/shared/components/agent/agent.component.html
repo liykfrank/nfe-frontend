@@ -1,0 +1,122 @@
+<form [formGroup]="model.agentFormModelGroup">
+  <div class="form-row">
+
+    <div class="form-group col-3">
+      <bspl-input-form-control
+        l10nTranslate
+        [wrapText]="true"
+        [label]="'AGENT.code'"
+        [type]="'pattern'"
+        [typingPattern]="PT_NUMERIC"
+        [inputMaxTextLength]="'7'"
+        [groupForm]="model.agentFormModelGroup"
+        [controlName]="'agentCode'">
+      </bspl-input-form-control>
+    </div>
+
+    <div class="form-group col-2">
+      <bspl-input-form-control
+        l10nTranslate
+        [label]="'&nbsp;'"
+        [type]="'pattern'"
+        [typingPattern]="PT_NUMERIC"
+        [inputMaxTextLength]="'1'"
+        [groupForm]="model.agentFormModelGroup"
+        [controlName]="'agentControlDigit'">
+      </bspl-input-form-control>
+    </div>
+
+    <div class="form-group col-3">
+      <label>&nbsp;</label>
+      <button *ngIf="showMoreDetails" class="form-control button-default details-button" [disabled]="disabledMoreDetails" (click)="onClickMoreDetails()"
+        l10nTranslate>
+        AGENT.more
+      </button>
+    </div>
+  </div>
+
+  <div class="form-row" *ngIf="showAgentName">
+    <div class="form-group col-6">
+      <label l10nTranslate>AGENT.name</label>
+      <input [disabled]="true" class="form-control mb-3" type="text" [value]="agent.name">
+    </div>
+  </div>
+
+  <div class="form-row" *ngIf="agentVatNumberEnabled">
+    <div class="form-group col-5">
+      <bspl-input-form-control
+        l10nTranslate
+        [wrapText]="true"
+        [label]="'AGENT.agentVAT'"
+        [inputMaxTextLength]="'15'"
+        [type]="'regex'"
+        [typingPattern]="PT_NUMERIC"
+        [groupForm]="model.agentFormModelGroup"
+        [controlName]="'agentVatNumber'">
+      </bspl-input-form-control>
+    </div>
+  </div>
+
+  <div class="form-row" *ngIf="companyRegistrationNumberEnabled">
+    <div class="form-group col-6">
+      <bspl-input-form-control
+        l10nTranslate
+        [wrapText]="true"
+        [label]="'AGENT.companyReg'"
+        [inputMaxTextLength]="'20'"
+        [type]="'regex'"
+        [typingPattern]="PT_ALPHA"
+        [groupForm]="model.agentFormModelGroup"
+        [controlName]="'agentRegistrationNumber'">
+      </bspl-input-form-control>
+    </div>
+  </div>
+
+  <bspl-contact
+    *ngIf="showContact"
+    [model]="model.agentContact"
+    [disabledComponent]="disabledContact">
+  </bspl-contact>
+</form>
+
+<p-dialog
+    styleClass="info-card"
+    [(visible)]="display"
+    [resizable]="false"
+    [modal]="true"
+    [responsive]="true"
+    [width]="430"
+    [closable]="false"
+    appendTo="body">
+  <p-header>
+    <span l10nTranslate>AGENT.POPUP.title</span>
+  </p-header>
+  <div>
+    <table>
+      <tbody>
+        <tr>
+          <th l10nTranslate>AGENT.POPUP.address</th>
+          <td>{{agent.billingStreet}}</td>
+        </tr>
+        <tr>
+          <th l10nTranslate>AGENT.POPUP.postcode</th>
+          <td>{{agent.billingPostalCode}}</td>
+        </tr>
+        <tr>
+          <th l10nTranslate>AGENT.POPUP.city</th>
+          <td>{{agent.billingCity}}</td>
+        </tr>
+        <tr>
+          <th l10nTranslate>AGENT.POPUP.country</th>
+          <td>{{agent.billingCountry}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pull-right">
+      <button (click)="onClose()" l10nTranslate class="btn btn-s btn-primary">
+        close_button
+      </button>
+    </div>
+  </div>
+</p-dialog>

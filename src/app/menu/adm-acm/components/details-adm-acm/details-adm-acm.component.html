@@ -1,0 +1,126 @@
+<form [formGroup]="acdmDetailsForm" appIdentifier [base]="'ACDM.details'">
+  <div class="row">
+    <div class="col-6">
+
+      <div class="form-row">
+        <div class="form-group col-6">
+          <label class="text-nowrap" l10nTranslate>ADM_ACM.DETAILS.ticketIssueDate</label>
+          <p-calendar styleClass="custom form-control"
+            panelStyleClass="custom"
+            readonlyInput="true"
+            appendTo="body"
+            formControlName="dateOfIssueRelatedDocument"
+            showIcon="true">
+          </p-calendar>
+          <bspl-field-error
+            error="acdmDetailsForm.get('dateOfIssueRelatedDocument').errors">
+          </bspl-field-error>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <bspl-input-form-control l10nTranslate
+          [wrapText]="true"
+          [label]="'ADM_ACM.DETAILS.passenger'"
+          [groupForm]="acdmDetailsForm"
+          [controlName]="'passenger'"
+          [type]="'regex'"
+          [typingPattern]="PT_PASSENGER">
+        </bspl-input-form-control>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-7">
+          <bspl-input-form-control l10nTranslate
+            [wrapText]="true"
+            [label]="'ADM_ACM.DETAILS.documents'"
+            [type]="'regex'"
+            [typingPattern]="PT_NUMERIC"
+            [inputMaxTextLength]="13"
+            [groupForm]="model.extra"
+            [controlName]="'ticketDocumentNumberToAdd'">
+          </bspl-input-form-control>
+        </div>
+
+        <div class="form-group col-4">
+          <label>&nbsp;</label>
+          <button l10nTranslate class="form-control button-add"
+            [disabled]="buttonRelatedTickedDocumentDisabled()"
+            (click)="onClickAddRelatedTicketDocument()">
+            <span class="small-font-awesome fa-stack">
+              <i class="fa fa-circle fa-stack-2x"></i>
+              <i class="fa fa-plus inverse-color fa-stack-1x"></i>
+            </span>
+            ADM_ACM.DETAILS.addDocument
+          </button>
+        </div>
+      </div>
+
+      <div formArrayName="relatedTicketDocuments">
+        <div class="row" *ngFor="let aux of model.relatedTicketDocuments.controls; let i=index" [formGroupName]="i">
+          <div class="offset-1 col-5">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              [value]="aux.get('relatedTicketDocumentNumber').value">
+          </div>
+          <div class="col-1">
+            <button class="btn btn-outline-secondary button-bin-float-right ml-1" (click)="onCkickTrashIcon(i)">
+              <i class="fa fa-trash-o fa-lg"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="col-6">
+
+      <div class="form-row">
+        <bspl-input-form-control l10nTranslate
+          [wrapText]="true"
+          [label]="'ADM_ACM.DETAILS.reasonIssue'"
+          [type]="'regex'"
+          [typingPattern]="PT_ALPHANUMERIC_UPPERCASE"
+          [inputMaxTextLength]="5"
+          [groupForm]="acdmDetailsForm"
+          [controlName]="'reasonForMemoIssuanceCode'">
+        </bspl-input-form-control>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-6 pl-0 pr-0">
+          <bspl-reasons-selector
+            [dropdownTitle]="'ADM_ACM.DETAILS.reasonMemo'"
+            [isoCode]="configuration.isoCountryCode"
+            [type]="type"
+            (changeSelect)="onSelectorChange($event)">
+          </bspl-reasons-selector>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-12 col-xl-7 pl-0 pr-0">
+          <label class="text-nowrap" for="detailed_reasons">
+            <span class="label-text mr-3" l10nTranslate>REFUNDS.DETAILS.detailed_reasons</span>
+            <div class="label-text" *ngIf="showError()" >
+              <bspl-field-error
+                [errors]="acdmDetailsForm.get('reasonForMemo').errors">
+              </bspl-field-error>
+            </div>
+          </label>
+          <textarea
+            id="detailed_reasons"
+            rows="4"
+            class="form-control"
+            formControlName="reasonForMemo">
+          </textarea>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</form>

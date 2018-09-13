@@ -1,0 +1,323 @@
+<div class="row" appIdentifier [base]="'REFUND.RA.details'">
+  <div class="col">
+
+    <form [formGroup]="detailsRefundGroup">
+
+      <!-- CATEGORY -->
+      <div class="form-row">
+        <div class="form-group col-4">
+          <bspl-stat
+            [label]="'REFUNDS.DETAILS.category'"
+            [domesticLabel]="'REFUNDS.DETAILS.domestic'"
+            [internacionalLabel]="'REFUNDS.DETAILS.internacional'"
+            [freeStat]="refundConfiguration.freeStat"
+            [defaultStat]="refundConfiguration.defaultStat == 'DOM' ? 'D' : 'I'"
+            [groupForm]="detailsRefundGroup"
+            [controlName]="'statisticalCode'">
+          </bspl-stat>
+        </div>
+      </div>
+
+      <!-- PASSENGER NAME -->
+      <div class="form-row">
+        <div class="form-group col-5">
+          <bspl-input-form-control l10nTranslate
+            [wrapText]="true"
+            [label]="'REFUNDS.DETAILS.passenger_name'"
+            [type]="'regex'"
+            [typingPattern]="PT_PASSSENGER"
+            [inputMaxTextLength]="'49'"
+            [groupForm]="detailsRefundGroup"
+            [controlName]="'passenger'">
+          </bspl-input-form-control>
+        </div>
+      </div>
+
+      <!-- REASON FOR REFUND AND DETAILED REASONS -->
+      <div class="form-row">
+        <div class="form-group col-3">
+          <bspl-reasons-selector
+            [dropdownTitle]="'REFUNDS.DETAILS.reason_for_refund'"
+            [isoCode]="user.isoc"
+            [type]="type"
+            (changeSelect)="onSelectorChange($event)">
+          </bspl-reasons-selector>
+        </div>
+
+        <div class="form-group offset-3 col-5">
+          <div class="form-row">
+            <label class="text-nowrap pull-left mr-2 pl-1" l10nTranslate>REFUNDS.DETAILS.detailed_reasons</label>
+
+            <bspl-field-error
+              *ngIf="showIssueReasonError()"
+              [errors]="detailsRefundGroup.get('issueReason').errors">
+            </bspl-field-error>
+          </div>
+
+          <textarea
+            [ngClass]="{'border-red': showIssueReasonError()}"
+            id="detailed_reasons"
+            rows="4"
+            class="form-control"
+            formControlName="issueReason">
+          </textarea>
+        </div>
+      </div>
+
+      <!-- SECTION DOCUMENT NUMBER -->
+      <div class="form-row">
+        <div class="form-group col-1">
+          <bspl-input-form-control l10nTranslate
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_AIRLINE"
+            [inputMaxTextLength]="3"
+            [groupForm]="detailsRefundGroup"
+            [controlName]="'airlineCodeRelatedDocument'"
+            [label]="'REFUNDS.DETAILS.document_number'">
+          </bspl-input-form-control>
+        </div>
+
+        <div class="form-group col-2">
+          <bspl-input-form-control
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_NUMBER"
+            [inputMaxTextLength]="10"
+            [groupForm]="detailsRefundGroup.get('relatedDocument')"
+            [controlName]="'relatedTicketDocumentNumber'"
+            [label]="'&nbsp;'">
+          </bspl-input-form-control>
+        </div>
+
+        <div class="form-row col-3">
+          <bspl-input-check-switch
+            [groupForm]="model.relatedDocument"
+            [controlName]="'relatedTicketCoupon1'"
+            [isCheckBox]="true"
+            [label]="'&nbsp;'"
+            [labelCheck]="'1'">
+          </bspl-input-check-switch>
+          <bspl-input-check-switch
+            [groupForm]="model.relatedDocument"
+            [controlName]="'relatedTicketCoupon2'"
+            [isCheckBox]="true"
+            [label]="'&nbsp;'"
+            [labelCheck]="'2'">
+          </bspl-input-check-switch>
+          <bspl-input-check-switch
+            [groupForm]="model.relatedDocument"
+            [controlName]="'relatedTicketCoupon3'"
+            [isCheckBox]="true"
+            [label]="'&nbsp;'"
+            [labelCheck]="'3'">
+          </bspl-input-check-switch>
+          <bspl-input-check-switch
+            [groupForm]="model.relatedDocument"
+            [controlName]="'relatedTicketCoupon4'"
+            [isCheckBox]="true"
+            [label]="'&nbsp;'"
+            [labelCheck]="'4'">
+          </bspl-input-check-switch>
+        </div>
+
+        <!-- ISSUE DATE -->
+        <div class="form-group col-2 pr-3">
+          <label class="text-nowrap" l10nTranslate>REFUNDS.DETAILS.issue_date</label>
+          <p-calendar
+            styleClass="custom form-control"
+            panelStyleClass="custom"
+            formControlName="dateOfIssueRelatedDocument"
+            readonlyInput="true"
+            appendTo="body"
+            dateFormat="ddMy"
+            [locale] = "'date' | translate"
+            showIcon="true">
+          </p-calendar>
+        </div>
+
+        <!-- WAIVER CODE -->
+        <div class="form-group col-4">
+          <bspl-input-form-control l10nTranslate
+            [type]="'regex'"
+            [typingPattern]="PT_WAIVERCODE"
+            [label]="'REFUNDS.DETAILS.waiver_code'"
+            [groupForm]="detailsRefundGroup"
+            [controlName]="'waiverCode'"
+            [inputMaxTextLength]="14">
+          </bspl-input-form-control>
+        </div>
+      </div>
+
+      <!--SECTION CNJ -->
+      <div formArrayName="conjunctions">
+        <div class="form-row" *ngFor="let cnj of model.conjunctions.controls; let i = index" [formGroupName]="i">
+
+          <div class="form-group align-bottom col-1">
+            <label>&nbsp;</label>
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              [value]="'REFUNDS.DETAILS.cnj' | translate">
+          </div>
+
+          <!-- DOCUMENT -->
+          <div class="form-group col-2">
+            <bspl-input-form-control
+              [wrapText]="true"
+              [type]="'regex'"
+              [typingPattern]="PT_NUMBER"
+              [inputMaxTextLength]="10"
+              [groupForm]="detailsRefundGroup.get('conjunctions').get(i.toString())"
+              [controlName]="'relatedTicketDocumentNumber'"
+              [label]="'&nbsp;'">
+            </bspl-input-form-control>
+          </div>
+
+          <!-- CHECBOXES -->
+          <div class="form-row col-3">
+            <bspl-input-check-switch
+              [groupForm]="cnj"
+              [controlName]="'relatedTicketCoupon1'"
+              [isCheckBox]="true"
+              [label]="'&nbsp;'"
+              [labelCheck]="'1'">
+            </bspl-input-check-switch>
+            <bspl-input-check-switch
+              [groupForm]="cnj"
+              [controlName]="'relatedTicketCoupon2'"
+              [isCheckBox]="true"
+              [label]="'&nbsp;'"
+              [labelCheck]="'2'">
+            </bspl-input-check-switch>
+            <bspl-input-check-switch
+              [groupForm]="cnj"
+              [controlName]="'relatedTicketCoupon3'"
+              [isCheckBox]="true"
+              [label]="'&nbsp;'"
+              [labelCheck]="'3'">
+            </bspl-input-check-switch>
+            <bspl-input-check-switch
+              [groupForm]="cnj"
+              [controlName]="'relatedTicketCoupon4'"
+              [isCheckBox]="true"
+              [label]="'&nbsp;'"
+              [labelCheck]="'4'">
+            </bspl-input-check-switch>
+          </div>
+
+          <!-- BUTTON REMOVE -->
+          <div class="form-group col-1" *ngIf="showTrashCNG()">
+            <label>&nbsp;</label>
+            <input
+              readonly
+              class="form-control-plaintext ico-trash-container"
+              (click)="removeCNJ(i)">
+          </div>
+
+          <!-- BUTTON ADD -->
+          <div class="form-group col-2">
+            <label>&nbsp;</label>
+            <button
+                class="form-control btn btn-primary btn-blue"
+                *ngIf="showAddCNJ(i)"
+                l10nTranslate
+                [disabled]="disableAddCNJ()"
+                (click)="addCNJ()">
+              <i class="fa fa-plus-circle"></i> REFUNDS.DETAILS.buttonPlus
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CKECKBOX EXCHANGE -->
+      <div class="form-row">
+        <bspl-input-check-switch l10nTranslate
+          [groupForm]="detailsRefundGroup"
+          [controlName]="'exchange'"
+          [isCheckBox]="true"
+          [label]="'&nbsp;'"
+          [labelCheck]="'REFUNDS.DETAILS.exchange'">
+        </bspl-input-check-switch>
+      </div>
+
+      <!-- ORIGINAL ISSUE DETAILS -->
+      <div class="form-row">
+        <h3 l10nTranslate class="title-refund mt-2">REFUNDS.DETAILS.original_issue_details</h3>
+      </div>
+
+      <!-- ORIGINAL ISSUE DETAILS -->
+      <div class="form-row" formGroupName="originalIssue">
+
+        <!-- DOCUMENT NUMBER -->
+        <div class="form-group col-1">
+          <bspl-input-form-control l10nTranslate
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_AIRLINE"
+            [inputMaxTextLength]="3"
+            [groupForm]="model.originalIssue"
+            [controlName]="'originalAirlineCode'"
+            [label]="'REFUNDS.DETAILS.document_number'">
+          </bspl-input-form-control>
+        </div>
+
+        <div class="form-group col-2">
+          <bspl-input-form-control
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_NUMBER"
+            [inputMaxTextLength]="10"
+            [groupForm]="model.originalIssue"
+            [controlName]="'originalTicketDocumentNumber'"
+            [label]="'&nbsp;'">
+          </bspl-input-form-control>
+        </div>
+
+        <!-- ISSUE AGENT -->
+        <div class="form-group col-2">
+          <bspl-input-form-control
+            l10nTranslate
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_NUMBER"
+            [inputMaxTextLength]="7"
+            [groupForm]="model.originalIssue"
+            [controlName]="'originalAgentCode'"
+            [label]="'REFUNDS.DETAILS.issuing_agent'">
+          </bspl-input-form-control>
+        </div>
+
+        <!-- DATE -->
+        <div class="form-group col-2 pr-3" [formGroup]="model.originalIssue">
+          <label class="text-nowrap" l10nTranslate>Date</label>
+          <p-calendar
+            styleClass="custom form-control"
+            panelStyleClass="custom"
+            formControlName="originalDateOfIssue"
+            readonlyInput="true"
+            appendTo="body"
+            dateFormat="ddMy"
+            [locale] = "'date' | translate"
+            showIcon="true">
+          </p-calendar>
+        </div>
+
+        <!-- PLACE (CITY CODE) -->
+        <div class="form-group col-2">
+          <bspl-input-form-control l10nTranslate
+            [label]="'REFUNDS.DETAILS.place_city_code'"
+            [wrapText]="true"
+            [type]="'regex'"
+            [typingPattern]="PT_TEXT"
+            [inputMaxTextLength]="3"
+            [groupForm]="model.originalIssue"
+            [controlName]="'originalLocationCityCode'">
+          </bspl-input-form-control>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>

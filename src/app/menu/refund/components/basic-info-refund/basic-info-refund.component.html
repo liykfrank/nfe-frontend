@@ -1,0 +1,24 @@
+<div class="row" appIdentifier [base]="'REFUND.RA.basic_info'">
+  <div class="col-6">
+    <bspl-airline
+      [airlineVatNumberEnabled]="refundConfiguration.airlineVatNumberEnabled"
+      [companyRegistrationNumberEnabled]="refundConfiguration.companyRegistrationNumberEnabled"
+      [showAirlineName] = "true"
+      [showContact]= "true"
+      [disabledContact] = "true"
+      [model]="model.airline"
+      [isoCountryCode]="user.isoc">
+    </bspl-airline>
+  </div>
+  <div class="col-6">
+    <bspl-agent
+      [model]="model.agent"
+      [agentVatNumberEnabled]="refundConfiguration.agentVatNumberEnabled"
+      [companyRegistrationNumberEnabled]="refundConfiguration.companyRegistrationNumberEnabled"
+      [showAgentName]="true"
+      [showContact]="true"
+      [showMoreDetails]="true"
+      [agentCode]="user.iataCode">
+    </bspl-agent>
+  </div>
+</div>

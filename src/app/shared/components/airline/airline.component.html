@@ -1,0 +1,118 @@
+<form [formGroup]="model.airlineFormModelGroup">
+  <div class="form-row">
+
+    <div class="form-group col-2 minWidth" >
+      <bspl-input-form-control
+        l10nTranslate
+        [wrapText]="true"
+        [label]="'AIRLINE.code'"
+        [inputMaxTextLength]="'3'"
+        [type]="'regex'"
+        [typingPattern]="'^[a-zA-Z0-9]*$'"
+        [groupForm]="model.airlineFormModelGroup"
+        [controlName]="'airlineCode'">
+      </bspl-input-form-control>
+    </div>
+
+    <div class="form-group col-3" *ngIf="showMoreDetails">
+      <label>&nbsp;</label>
+      <button
+        l10nTranslate
+        class="form-control button-default details-button"
+        [disabled]="disabledMoreDetails"
+        (click)="onClickMoreDetails()">AIRLINE.more
+      </button>
+    </div>
+  </div>
+
+  <div class="form-row" *ngIf="showAirlineName">
+    <div class="form-group col-6">
+      <label l10nTranslate>AIRLINE.name</label>
+      <input
+        class="form-control mb-3"
+        type="text"
+        [disabled]="true"
+        [value]="airline.globalName">
+    </div>
+  </div>
+
+  <div class="form-row" *ngIf="airlineVatNumberEnabled">
+    <div class="form-group col-5">
+      <bspl-input-form-control
+        l10nTranslate
+        [wrapText]="true"
+        [label]="'AIRLINE.airlineVAT'"
+        [type]="'regex'"
+        [typingPattern]="'^[0-9]*$'"
+        [inputMaxTextLength]="'15'"
+        [groupForm]="model.airlineFormModelGroup"
+        [controlName]="'airlineVatNumber'">
+      </bspl-input-form-control>
+    </div>
+  </div>
+
+  <div class="form-row" *ngIf="companyRegistrationNumberEnabled">
+    <div class="form-group col-6">
+      <bspl-input-form-control
+        l10nTranslate
+        [wrapText]="true"
+        [label]="'AIRLINE.companyReg'"
+        [type]="'regex'"
+        [typingPattern]="'^[a-zA-Z0-9]*$'"
+        [inputMaxTextLength]="'20'"
+        [groupForm]="model.airlineFormModelGroup"
+        [controlName]="'airlineRegistrationNumber'">
+      </bspl-input-form-control>
+    </div>
+  </div>
+
+  <bspl-contact
+    *ngIf="showContact"
+    [model]="model.airlineContact"
+    [disabledComponent]="disabledContact"
+    (returnForm)="onChangeContact($event)">
+  </bspl-contact>
+
+</form>
+
+<p-dialog
+    styleClass="info-card"
+    [(visible)]="display"
+    [resizable]="false"
+    [modal]="true"
+    [responsive]="true"
+    [width]="430"
+    [closable]="false"
+    appendTo="body">
+  <p-header>
+    <span l10nTranslate>AIRLINE.POPUP.title</span>
+  </p-header>
+  <div>
+    <table>
+      <tbody>
+        <tr>
+          <th l10nTranslate>AIRLINE.POPUP.address</th>
+          <td>{{airline.address1}}</td>
+        </tr>
+        <tr>
+          <th l10nTranslate>AIRLINE.POPUP.postcode</th>
+          <td>{{airline.postalCode}}</td>
+        </tr>
+        <tr>
+          <th l10nTranslate>AIRLINE.POPUP.city</th>
+          <td>{{airline.city}}</td>
+        </tr>
+        <tr>
+          <th l10nTranslate>AIRLINE.POPUP.country</th>
+          <td>{{airline.country}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pull-right">
+      <button (click)="onClose()" l10nTranslate class="btn btn-s btn-primary">
+        close_button
+      </button>
+    </div>
+  </div>
+</p-dialog>
